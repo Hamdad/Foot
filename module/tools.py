@@ -1,9 +1,6 @@
-from ..soccersimulator import SoccerState
-
 #objets pour un match
 
-from ..soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simulation, show_simu, settings
-
+from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simulation, show_simu, settings
 class SupState(object):
 
 	def __init__(self,state,idteam,idplayer) :
@@ -19,25 +16,18 @@ class SupState(object):
 		self.sens = 1 if self.key[0] == 1 else -1
 
     #si le joueur peut tirer METHODEEEEEEEEEEEE
-    		|self.my_position = self.state.player_state(self.key[0], self.key[1]).position
-		|self.ball_position = c
-    		|self.can_shoot = True if self.my_position.distance(self.ball_position) <= (settings.PLAYER_RADIUS + settings.BALL_RADIUS) else False
-		|self.v_ball = self.state.ball.vitesse
+		self.my_position = self.state.player_state(self.key[0], self.key[1]).position
+	#	|self.ball_position = c
+    	#	|self.can_shoot = True if self.my_position.distance(self.ball_position) <= (settings.PLAYER_RADIUS + settings.BALL_RADIUS) else False
+	#	|self.v_ball = self.state.ball.vitesse
     	#a revoir sans pitié
-          |self.adv_on_right = 1 if self.state.player_state(self.adv_players[0][0], self.adv_players[0][1]).position.y > self.my_position.y else -1
-		|self.my_v = self.state.player_state(self.key[0], self.key[1]).vitesse
+         # |self.adv_on_right = 1 if self.state.player_state(self.adv_players[0][0], self.adv_players[0][1]).position.y > self.my_position.y else -1
+	#	|self.my_v = self.state.player_state(self.key[0], self.key[1]).vitesse
 		#est proche de la balle
-		|self.near_ball = True if self.my_position.distance(self.ball_position) < settings.BALL_RADIUS else False
-
-		#liste des coeq proche
-          |self.coeq_proche = [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)]
-		#distance de la balle
-		|self.dist_ball = self.my_position.distance(self.ball_position)
-		|self.dist_but_adv = self.my_position.distance(self.but_adv)
-		|self.dist_but_mine = self.my_position.distance(self.but)
+	#	|self.near_ball = True if self.my_position.distance(self.ball_position) < settings.BALL_RADIUS else False
 
 
-    @property
+#    @property
 	def proche_ball(self):
 		me_ball = self.dist_ball
 		for p in self.all_players:
@@ -45,64 +35,134 @@ class SupState(object):
 			if me_ball > pos_p.distance(self.ball_position) :
 				return False
 		return True
+    
+    
+    
+   # def ball_dir(self):
+    #    return self.position-
+    
+    
+  #  def infront(self):
+   #     for player in self.adv_player:
+            
+            
+#      def can_sh  
+	"""def advfront(self):
+        for player in self.adv_players:
+            if player.position.x>self.my_position.x:
+                if player.position.y=self.my_position.y"""
 
 	@property
 	def have_ball(self):
-		return self.my_position.distance(self.ball_position) < 1
+        	return self.my_position.distance(self.ball_position) < 1
 
 
 #def adv_list(self):
 #   return [self.state.player_state(id_team,id_player).position for(id_team,id_player) in self]
-	@property
-     def my_position(self):
+	def my_position(self):
             return self.state.player_state(self.key[0], self.key[1]).position
 
-	@property
-     def ball_position(self):
+
+	def ball_position(self):
             return self.state.ball.position
-	@property
-     def can_shoot(self):
+
+	def can_shoot(self):
             if self.my_position.distance(self.ball_position) <= (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
                 return True
             return False
 
-	@property
-     def v_ball(self):
+
+	def v_ball(self):
             return self.state.ball.vitesse
 
    # def adv_on_right(self):
-        #a compléter
-	@property
+        #a compléterself
+      def appartient(self,[i,j])  
+	def eclatement(self):
+            l1=[] 
+            l2=[] 
+            l3=[] 
+            l4=[] 
+            l5=[] 
+            l6=[] 
+            l7=[] 
+            l8=[] 
+            l9=[]
+            l10=[]
+            l11=[]
+            l12=[]
+            l13=[]
+            l14=[]
+            l15=[]
+            l16=[]
+            for player in self.all_players:
+                if player.position.x<settings.GAME_WIDTH//4:
+                    if player.position.y<settings.GAME_HEIGHT//4:
+                        l1.add(player)
+                    elif player.position.y<settings.GAME_HEIGHT//2:
+                        l5.add(player)
+                    elif player.position.y<3*settings.GAME_HEIGHT//4:
+                        l9.add(player)
+                    else:
+                        l12.add(player)
+                elif player.position.x<settings.GAME_WIDTH//2:
+                    if player.position.y<settings.GAME_HEIGHT//4:
+                        l2.add(player)
+                    elif player.position.y<settings.GAME_HEIGHT//2:
+                        l6.add(player)
+                    elif player.position.y<3*settings.GAME_HEIGHT//4:
+                        l10.add(player)
+                    else:
+                        l14.add(player)                           
+                elif player.position.x<3*settings.GAME_WIDTH//4:
+                    if player.position.y<settings.GAME_HEIGHT//4:
+                        l.add(player) #############a9lin dayi
+                    elif player.position.y<settings.GAME_HEIGHT//2:
+                        l10.add(player)
+                    elif player.position.y<3*settings.GAME_HEIGHT//4:
+                        l11.add(player)
+                    else:
+                        l12.add(player)   
+                else:
+                    if player.position.y<settings.GAME_HEIGHT//4:
+                        l13.add(player)
+                    elif player.position.y<settings.GAME_HEIGHT//2:
+                        l14.add(player)
+                    elif player.position.y<3*settings.GAME_HEIGHT//4:
+                        l15.add(player)
+                    else:
+                        l16.add(player)              
+                                    #a completer
+             
+                return [[l1,l2,l3,l4],[l5]]
 	def coeq_proche(self):
-       return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
+		return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
 
-   @property
-    def my_vit(self):
-    	return self.state.player_state(self.key[0], self.key[1]).vitesse
+	def my_vit(self):
+		return self.state.player_state(self.key[0], self.key[1]).vitesse
 
-	@property
-    def near_ball(self):
-    	if self.my_position.distance(self.ball_position) < settings.BALL_RADIUS:
-        	return True
-        return False
+	def near_ball(self):
+		if self.my_position.distance(self.ball_position) < settings.BALL_RADIUS:
+			return True
+		return False
 
-	@property
+
 	def dist_ball(self):
-          return self.my_position.distance(self.ball_position)
+		return self.my_position.distance(self.ball_position())
 
- 	 @property
-	 def dist_but_adv(self):
-         return self.my_position.distance(self.but_adv)
 
- 	 @property
-	 def dist_mon_but(self):
-         return self.my_position.distance(self.but)
+	def dist_but_adv(self):
+		return self.my_position.distance(self.but_adv)
 
-	 @property
-	 def pos_adv_nearby(self):
+
+	def dist_mon_but(self):
+		return self.my_position.distance(self.but)
+
+
+	def pos_adv_nearby(self):
      		return min([(self.player.distance(player),player) for player in self.adv_players])[1]
 
-	@property
+
 	def dist_adv_nearby(self):
 		return min([(self.player.distance(player),player) for player in self.adv_players])[0]
 
@@ -148,3 +208,4 @@ class SupState(object):
 		norm_fin = norm_base *2 - norm_tour
 		ball_pos_fin = self.ball_position + (self.v_ball.normalize() * norm_fin)
 		return ball_pos_fin
+
