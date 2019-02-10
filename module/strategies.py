@@ -154,7 +154,7 @@ class Shoot2(object):
          if self.SupState.my_position.y>settings.GAME_HEIGHT/2:
              return SoccerAction(shoot=Vector2D(angle=3*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))
          return  SoccerAction(shoot=Vector2D(angle=5*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))   
-     
+ """    
 # Create teams
 team1 = SoccerTeam(name="Team 1")
 team2 = SoccerTeam(name="Team 2")
@@ -176,4 +176,4 @@ simu = Simulation(team1, team2)
 
 # Simulate and display the match
 show_simu(simu)
-
+"""
