@@ -4,10 +4,10 @@ from soccersimulator import SoccerTeam
 def get_team(nb_players):
     team = SoccerTeam(name="Strange's Team")
     if nb_players == 1:
-        team.add("AssiremRandom", Strategy())
+        team.add("CR7",SoloStrategy())
     if nb_players == 2:
-        team.add("AssiremRandom",NotreStrategy())
-        team.add("ALILIOUUUUUU zyada g stade",Alilou_Strategy())
+        team.add("CR7",SoloStrategy())
+        team.add("DYBALA",SoloStrategy())
     return team
 
 
