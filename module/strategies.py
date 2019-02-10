@@ -24,6 +24,20 @@ class AttaquantStrategy(Strategy):
   #      if b.dot(k):
     #      if id_team==1
 
+
+"""class Defense(Strategy):
+	def __init__(self, name="defense"):
+		Strategy.__init__(self, name)
+	def compute_strategy(self,state, idteam, idplayer):
+ 
+
+
+
+
+
+
+"""
+
                                                                                                                                                   
 class FonceurStrategy(Strategy):
     def __init__(self):
@@ -130,24 +144,31 @@ class Shoot2(object):
     def to_goal2(self): #direction de la frappe
      # return self.shoot2(direction=Vector2D(0,50))
      #print(((self.SupState.dist_but_adv()*2**-0.5)*2))
-     if self.Suptate.sens ==1:
+     qte=(2*math.sqrt(2*(((1/4)*settings.GAME_WIDTH)**2)))
+     qte2=math.sqrt(qte)
+     if self.SupState.sens ==1:
          if self.SupState.my_position.y>settings.GAME_HEIGHT/2:    
-             return SoccerAction(shoot=Vector2D(angle=1*(math.pi/4.),norm=((self.SupState.dist_but_adv()*2**-0.5))))+SoccerAction(acceleration=Vector2D(self.Supstate.sens*50,0))
-         return  SoccerAction(shoot=Vector2D(angle=7*(math.pi/4.),norm=((self.SupState.dist_but_adv()*2**-0.5))))+SoccerAction(acceleration=Vector2D(self.Suptate.sens*50,0))   
+             return SoccerAction(shoot=Vector2D(angle=1*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))
+         return  SoccerAction(shoot=Vector2D(angle=7*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))   
      else:
          if self.SupState.my_position.y>settings.GAME_HEIGHT/2:
-             return SoccerAction(shoot=Vector2D(angle=3*(math.pi/4.),norm=((self.SupState.dist_but_adv()*2**-0.5))))+SoccerAction(acceleration=Vector2D(50,0))
-         return  SoccerAction(shoot=Vector2D(angle=5*(math.pi/4.),norm=((self.SupState.dist_but_adv()*2**-0.5))))+SoccerAction(acceleration=Vector2D(50,0))   
+             return SoccerAction(shoot=Vector2D(angle=3*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))
+         return  SoccerAction(shoot=Vector2D(angle=5*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))   
+     
 # Create teams
 team1 = SoccerTeam(name="Team 1")
 team2 = SoccerTeam(name="Team 2")
 
 # Add players
-team1.add("Random",SoloStrategy())  # Random strategy
+#team1.add("Random",FonceurStrategy())  # Random strategy
 #team1.add("Random3",FonceurStrategy()) 
+team1.add("ASSIREM",SoloStrategy()) 
+team1.add("3PILA", SoloStrategy())
 #team1.add("Fonceur1CR7", FonceurStrategy()) #Fonceur strategy
 #team2.add("Fonceur2", FonceurStrategy()) #Fonceur strategy
-team2.add("MESSI", SoloStrategy()) #Fonceur strategy
+team2.add("LYES", SoloStrategy())
+team2.add("3PILA", FonceurStrategy())
+ #Fonceur strategy
 print(team1.players,team2)
 #team2.add("Staatic", Strategy())   # Static strategy
 # Create a match
