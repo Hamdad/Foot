@@ -1,13 +1,14 @@
 #from "notre dossier" import "nos strategies"
 from soccersimulator import SoccerTeam
+from module.strategies import SoloStrategy
 
 def get_team(nb_players):
     team = SoccerTeam(name="Strange's Team")
     if nb_players == 1:
-        team.add("CR7",SoloStrategy())
+        team.add("###",SoloStrategy())
     if nb_players == 2:
-        team.add("CR7",SoloStrategy())
-        team.add("DYBALA",SoloStrategy())
+        team.add("###",SoloStrategy())
+        team.add("###",SoloStrategy())
     return team
 
 

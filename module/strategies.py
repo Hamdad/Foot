@@ -1,6 +1,6 @@
 from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simulation, show_simu, settings
 import math
-from tools import SupState
+from .tools import SupState
 class RandomStrategy(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Random")
@@ -57,9 +57,9 @@ class FonceurStrategy(Strategy):
            if player.distance(ball) < settings.PLAYER_RADIUS + settings.BALL_RADIUS:
                shoot_alt=goal-player
                if id_team==1:# ici on doit voir s'il y a un joueur a coté de la balle 
-                   shoot_alt.scale(0)
+                   shoot_alt.scale(1)
                else:
-                   shoot_alt.scale(0.01)
+                   shoot_alt.scale(1)
                return SoccerAction(shoot=shoot_alt)
            else:
                return SoccerAction(acceleration=ball-player)
@@ -77,7 +77,7 @@ class SoloStrategy(Strategy):
         # if sup.dist_but_adv()>settings.GAME_WIDTH//2:   
         if player.y>2*settings.GAME_HEIGHT/3 or player.y<settings.GAME_HEIGHT/3:                  
             if player.distance(ball) < settings.PLAYER_RADIUS + settings.BALL_RADIUS:
-                 if(sup.dist_but_adv()<settings.GAME_WIDTH/4): 
+                 if(sup.dist_but_adv()<settings.GAME_WIDTH/5): 
                       return SoccerAction(shoot=sup.but_adv-sup.my_position)
                  return (Shoot2(sup).to_goal2()+SoccerAction(acceleration=Vector2D(1,0)))
             else:
@@ -154,20 +154,20 @@ class Shoot2(object):
          if self.SupState.my_position.y>settings.GAME_HEIGHT/2:
              return SoccerAction(shoot=Vector2D(angle=3*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))
          return  SoccerAction(shoot=Vector2D(angle=5*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))   
- """    
-# Create teams
+  
+"""# Create teams
 team1 = SoccerTeam(name="Team 1")
 team2 = SoccerTeam(name="Team 2")
 
 # Add players
 #team1.add("Random",FonceurStrategy())  # Random strategy
 #team1.add("Random3",FonceurStrategy()) 
-team1.add("ASSIREM",SoloStrategy()) 
-team1.add("3PILA", SoloStrategy())
+team2.add("ASSIREM",SoloStrategy()) 
+#team1.add("3PILA", SoloStrategy())
 #team1.add("Fonceur1CR7", FonceurStrategy()) #Fonceur strategy
 #team2.add("Fonceur2", FonceurStrategy()) #Fonceur strategy
-team2.add("LYES", SoloStrategy())
-team2.add("3PILA", FonceurStrategy())
+#team2.add("LYES", SoloStrategy())
+team1.add("3PILA", FonceurStrategy())
  #Fonceur strategy
 print(team1.players,team2)
 #team2.add("Staatic", Strategy())   # Static strategy
@@ -175,5 +175,5 @@ print(team1.players,team2)
 simu = Simulation(team1, team2)
 
 # Simulate and display the match
-show_simu(simu)
-"""
+show_simu(simu)"""
+
