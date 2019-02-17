@@ -7,7 +7,7 @@ class SupState(object):
 		self.state = state
 		self.key = (idteam, idplayer)
 		self.but_adv = Vector2D(settings.GAME_WIDTH, settings.GAME_HEIGHT/2) if self.key[0] == 1 else Vector2D(0, settings.GAME_HEIGHT/2)
-		self.but = Vector2D(0, settings.GAME_HEIGHT/2) if self.key[0] == 1 else Vector2D(settings.GAME_WIDTH, settings.GAME_HEIGHT/2)
+		self.my_but = Vector2D(0, settings.GAME_HEIGHT/2) if self.key[0] == 1 else Vector2D(settings.GAME_WIDTH, settings.GAME_HEIGHT/2)
 		#recup joueur
 		self.all_players = self.state.players
 		self.co_players = [p  for p in self.all_players if (p[0] == self.key[0] and p[1] != self.key[1])]
@@ -29,10 +29,10 @@ class SupState(object):
 
 #    @property
 	def proche_ball(self):
-		me_ball = self.dist_ball
+		me_ball = self.dist_ball()
 		for p in self.all_players:
 			pos_p = self.state.player_state(p[0], p[1]).position
-			if me_ball > pos_p.distance(self.ball_position) :
+			if me_ball > pos_p.distance(self.ball_position()) :
 				return False
 		return True
     
@@ -67,7 +67,7 @@ class SupState(object):
             return self.state.ball.position
 
 	def can_shoot(self):
-            if self.my_position.distance(self.ball_position) <= (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+            if self.my_position.distance(self.ball_position()) <= (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
                 return True
             return False
 
@@ -155,8 +155,8 @@ class SupState(object):
 		return self.my_position.distance(self.but_adv)
 
 
-	def dist_mon_but(self):
-		return self.my_position.distance(self.but)
+	def dist_my_but(self):
+		return self.my_position.distance(self.my_but)
 
 
 	def pos_adv_nearby(self):
@@ -165,6 +165,11 @@ class SupState(object):
 
 	def dist_adv_nearby(self):
 		return min([(self.player.distance(player),player) for player in self.adv_players])[0]
+    
+	def dist_my_wall(self):
+		if self.my_position.y>settings.GAME_HEIGHT/2:
+			return settings.GAME_HEIGHT - self.my_position.y
+		return self.my_position.y
 
 	@property
 	def coeq_libre(self) :

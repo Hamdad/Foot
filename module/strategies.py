@@ -29,13 +29,6 @@ class AttaquantStrategy(Strategy):
 	def __init__(self, name="defense"):
 		Strategy.__init__(self, name)
 	def compute_strategy(self,state, idteam, idplayer):
- 
-
-
-
-
-
-
 """
 
                                                                                                                                                   
@@ -68,30 +61,49 @@ class FonceurStrategy(Strategy):
 class SoloStrategy(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Test")
+        self.i=0
         
     def compute_strategy(self, state, id_team, id_player):
         ball=state.ball.position
-        player=state.player_state(id_team,id_player).position
         sup=SupState(state,id_team,id_player)
-           #d=b-p
-        # if sup.dist_but_adv()>settings.GAME_WIDTH//2:   
-        if player.y>2*settings.GAME_HEIGHT/3 or player.y<settings.GAME_HEIGHT/3:                  
-            if player.distance(ball) < settings.PLAYER_RADIUS + settings.BALL_RADIUS:
-                 if(sup.dist_but_adv()<settings.GAME_WIDTH/5): 
-                      return SoccerAction(shoot=sup.but_adv-sup.my_position)
-                 return (Shoot2(sup).to_goal2()+SoccerAction(acceleration=Vector2D(1,0)))
+        if self.i == 0 :
+            if sup.dist_my_but()<settings.GAME_WIDTH//5 and sup.can_shoot() :
+                return SoccerAction(shoot=Vector2D(500*sup.sens,0))
+            if sup.my_position.y>3*settings.GAME_HEIGHT/4 or sup.my_position.y<settings.GAME_HEIGHT/4 :    #JE SUIS DANS LES DEUX QUARTS              
+                if sup.can_shoot() : #je peux tirer vu que proche de la balle
+                     if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #autorisation pour tirer
+                         return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #tirer vers les bois
+                     if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1):
+                        return SoccerAction(shoot=(sup.but_adv-sup.my_position))
+                     else :                            
+                       shoot=Shoot2(sup).to_goal2()
+                       print(sup.dist_my_wall())
+                       self.i=int(sup.dist_my_wall())*2
+                       print(self.i)
+                       if sup.proche_ball():
+                             return shoot+SoccerAction(acceleration=Vector2D(5*sup.sens,0))#faire un rebond 
+                       else:
+                            self.i=0
+                            return SoccerAction(shoot=((sup.my_but-sup.state.player_state(sup.adv_players[0][0],sup.adv_players[0][1]).position)*Vector2D(7*math.pi/8,60)).scale(5) , acceleration=Vector2D(0,3*-sup.sens))               #recupéré la direction entre le joueur adverse et les buts   
+                else:
+                      return SoccerAction(acceleration=(ball-sup.my_position)*300)       #je peux pas tirer trop loin de la balle donc je vais vers la balle          
             else:
-                  return SoccerAction(acceleration=ball-player)                 
-        else:
-            if player.distance(ball) < settings.PLAYER_RADIUS + settings.BALL_RADIUS:
-                  if(sup.dist_but_adv()<settings.GAME_WIDTH/4): 
-                      return SoccerAction(shoot=sup.but_adv-sup.my_position)
-                  else:
-                      pshoot=sup.but_adv-sup.my_position   
-                      return SoccerAction(shoot=pshoot.scale(0.02))
-            else:
-                  return SoccerAction(acceleration=ball-player)      
-          
+                if sup.can_shoot() : #si je suis dans les deux quarts du milieu
+                      if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #j'ai l'autorisation pour tirer
+                          return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #je tire
+                      else:
+                          return SoccerAction(shoot=(sup.but_adv-sup.my_position)*0.03) #je drible ac la balle 
+                else:
+                      return SoccerAction(acceleration=(ball-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
+        elif self.i > 0: #a utiliser pour aller tout droit dans le cas du rebon
+            self.i -= 1
+            qte=(2*math.sqrt(2*((sup.dist_my_wall())**2)))
+            qte2=math.sqrt(qte)
+            
+            return SoccerAction(acceleration=Vector2D(sup.sens*qte2,0)) #aller tout droit aprés le rebond
+        else :
+            self.i+=1
+            return SoccerAction(acceleration=Vector2D(0,0)) #on reste immobile au début 
 
 
 
@@ -139,21 +151,22 @@ class Shoot2(object):
             return SoccerAction(acceleration=self.SupState.ball_position-self.SupState.my_position)
         
     def to_goal(self, strength=1):
-        return self.shoot2(self.SupState.goal_dir()*strength) #remplacer goal_dir par but_adv  
+        return self.Shoot2((self.SupState.but_adv-self.SupState.my_position)*strength) 
 
     def to_goal2(self): #direction de la frappe
      # return self.shoot2(direction=Vector2D(0,50))
      #print(((self.SupState.dist_but_adv()*2**-0.5)*2))
-     qte=(2*math.sqrt(2*(((1/4)*settings.GAME_WIDTH)**2)))
+     qte=(2*math.sqrt(2*((self.SupState.dist_my_wall())**2)))
      qte2=math.sqrt(qte)
+     #print(self.i)
      if self.SupState.sens ==1:
          if self.SupState.my_position.y>settings.GAME_HEIGHT/2:    
-             return SoccerAction(shoot=Vector2D(angle=1*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))
-         return  SoccerAction(shoot=Vector2D(angle=7*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))   
+             return SoccerAction(shoot=Vector2D(angle=1*(math.pi/4.),norm=qte*10)*50,acceleration=Vector2D(self.SupState.sens*qte2*5,0))
+         return  SoccerAction(shoot=Vector2D(angle=7*(math.pi/4.),norm=qte*10)*50,acceleration=Vector2D(self.SupState.sens*qte2*5,0))   
      else:
          if self.SupState.my_position.y>settings.GAME_HEIGHT/2:
-             return SoccerAction(shoot=Vector2D(angle=3*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))
-         return  SoccerAction(shoot=Vector2D(angle=5*(math.pi/4.),norm=qte))+SoccerAction(acceleration=Vector2D(self.SupState.sens*qte2,0))   
+             return SoccerAction(shoot=Vector2D(angle=3*(math.pi/4.),norm=qte*10)*50,acceleration=Vector2D(self.SupState.sens*qte2*5,0))
+         return  SoccerAction(shoot=Vector2D(angle=5*(math.pi/4.),norm=qte*10)*50,acceleration=Vector2D(self.SupState.sens*qte2*5,0))   
   
 """# Create teams
 team1 = SoccerTeam(name="Team 1")
