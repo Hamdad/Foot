@@ -99,7 +99,7 @@ class DefenseStrategy(Strategy):
     def compute_strategy(self, state, id_team, id_player):
         sup=SupState(state,id_team,id_player)
         centre=Vector2D(4*settings.GAME_WIDTH/5,sup.ball_position().y)
-        print(state.ball)
+        #print(state.ball)
         if sup.can_shoot():
             return SoccerAction(shoot=  (sup.co_player_pos.position - sup.my_position)*10 , acceleration = centre - sup.my_position)
         if sup.proche_ball():
