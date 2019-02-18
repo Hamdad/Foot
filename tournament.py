@@ -1,19 +1,10 @@
 #from "notre dossier" import "nos strategies"
-from soccersimulator import SoccerTeam
-from module.strategies import SoloStrategy
 
-def get_team(nb_players):
-    team = SoccerTeam(name="Strange's Team")
-    if nb_players == 1:
-        team.add("###",SoloStrategy())
-    if nb_players == 2:
-        team.add("###",SoloStrategy())
-        team.add("###",SoloStrategy())
-    return team
 
 
 if __name__ == '__main__':
     from soccersimulator import Simulation, show_simu
+    from moduleH import get_team
     
     #Test avec 1 et 2 joueurs
     team1 = get_team(1)
@@ -26,9 +17,9 @@ if __name__ == '__main__':
     show_simu(simulation1)
     
     #Deuxieme simulation 2 vs 2 
-    team2_2 = get_team(2)
+    #team2_2 = get_team(2)
     
     #Lancement de la simulation 
-    simulation2 = Simulation(team2,team2_2)
-    show_simu(simulation2)
+    #simulation2 = Simulation(team2,team2_2)
+    #show_simu(simulation2)
     
