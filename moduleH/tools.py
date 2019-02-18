@@ -13,7 +13,6 @@ class SupState(object):
 		self.co_players = [p  for p in self.all_players if (p[0] == self.key[0] and p[1] != self.key[1])]
 		if len(self.co_players)==1 :
 			self.co_player = self.co_players[0]
-		if len(self.co_players)==1 :
 			self.co_player_pos = self.state.player_state(self.co_player[0],self.co_player[1])
 		self.adv_players = [p  for p in self.all_players if p[0] != self.key[0]]
 		#variable pour avoir le sens pour pouvoir l'utiliser lors de changement ...
@@ -130,6 +129,22 @@ class SupState(object):
                                     #a completer
              
                 return [[l1,l2,l3,l4],[l5]]
+
+
+
+
+	def autor_attaq(self):     
+         return (self.ball_position().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.ball_position().x>settings.GAME_WIDTH/3 and self.sens==1)
+
+
+	def bien_pos(self):
+         empl=Vector2D(settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
+         if self.sens==-1:
+             return SoccerAction(acceleration=empl-self.my_position)
+         else:
+             empl=Vector2D(3*settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
+             return SoccerAction(acceleration=empl-self.my_position)
+     
 	def coeq_proche(self):
 		return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
 
