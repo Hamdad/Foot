@@ -11,6 +11,10 @@ class SupState(object):
 		#recup joueur
 		self.all_players = self.state.players
 		self.co_players = [p  for p in self.all_players if (p[0] == self.key[0] and p[1] != self.key[1])]
+		if len(self.co_players)==1 :
+			self.co_player = self.co_players[0]
+		if len(self.co_players)==1 :
+			self.co_player_pos = self.state.player_state(self.co_player[0],self.co_player[1])
 		self.adv_players = [p  for p in self.all_players if p[0] != self.key[0]]
 		#variable pour avoir le sens pour pouvoir l'utiliser lors de changement ...
 		self.sens = 1 if self.key[0] == 1 else -1
@@ -197,10 +201,9 @@ class SupState(object):
 			return SoccerAction(acceleration=(self.ball_position() - self.my_position).normalize())
 
 
-	@property
 	def predict_ball(self):
-		norm_base = self.v_ball.norm
-		norm_tour = self.v_ball.norm - settings.ballBrakeSquare * self.v_ball.norm ** 2 - settings.ballBrakeConstant * self.v_ball.norm
+		norm_base = self.v_ball().norm
+		norm_tour = self.v_ball().norm - settings.ballBrakeSquare * self.v_ball().norm ** 2 - settings.ballBrakeConstant * self.v_ball().norm
 		norm_fin = norm_base *2 - norm_tour
-		ball_pos_fin = self.ball_position + (self.v_ball.normalize() * norm_fin)
+		ball_pos_fin = self.ball_position() + (self.v_ball().normalize() * norm_fin)
 		return ball_pos_fin
