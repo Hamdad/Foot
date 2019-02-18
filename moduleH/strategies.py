@@ -91,7 +91,67 @@ class SoloStrategy(Strategy):
             self.i+=1
             return SoccerAction(acceleration=Vector2D(0,0)) #on reste immobile au début 
 
+class DefenseStrategy(Strategy):
+    def __init__(self):
+        Strategy.__init__(self, "Defense")
+        #self.i=-50
+
+    def compute_strategy(self, state, id_team, id_player):
+        sup=SupState(state,id_team,id_player)
+        centre=Vector2D(3*settings.GAME_WIDTH/4,sup.ball_position().y)
+        if sup.dist_ball()<settings.GAME_WIDTH/6:
+            return SoccerAction(shoot=sup.but_adv-sup.my_position,acceleration=sup.ball_position()-sup.my_position)
+        return SoccerAction(acceleration=centre-sup.my_position)
+
     
+
+class SoloStrategy2(Strategy):
+    def __init__(self):
+        Strategy.__init__(self, "Test")
+        self.i=-50
+        
+    def compute_strategy(self, state, id_team, id_player):
+        """"ball=state.ball.position
+        player=state.player_state(id_team,id_player).position
+        if player.distance(ball) > (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+            return SoccerAction(acceleration=ball-player)"""
+        ball=state.ball.position
+        sup=SupState(state,id_team,id_player)
+        if self.i == 0 :
+            if sup.dist_my_but()<settings.GAME_WIDTH//5 and sup.can_shoot() :
+                return SoccerAction(shoot=Vector2D(500*sup.sens,0))
+            if sup.my_position.y>3*settings.GAME_HEIGHT/4 or sup.my_position.y<settings.GAME_HEIGHT/4 :    #JE SUIS DANS LES DEUX QUARTS              
+                if sup.can_shoot() : #je peux tirer vu que proche de la balle
+                     if(sup.dist_but_adv()<settings.GAME_WIDTH/5): #autorisation pour tirer
+                         return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #tirer vers les bois
+                     if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1):
+                        return SoccerAction(shoot=(sup.but_adv-sup.my_position))
+                     else :                            
+                       shoot=Shoot2(sup).to_goal2()
+                       #print(sup.dist_my_wall())
+                       self.i=int(sup.dist_my_wall())*2
+                       #if sup.proche_ball():
+                       return shoot+SoccerAction(acceleration=Vector2D(2*sup.dist_my_wall()*sup.sens,0))#faire un rebond
+                else:
+                      return SoccerAction(acceleration=(ball-sup.my_position)*300)       #je peux pas tirer trop loin de la balle donc je vais vers la balle          
+            else:
+                if sup.can_shoot() : #si je suis dans les deux quarts du milieu
+                      if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #j'ai l'autorisation pour tirer
+                          return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #je tire
+                      else:
+                          return SoccerAction(shoot=(sup.but_adv-sup.my_position).norm_max(10)) #je drible ac la balle 
+                else:
+                      return SoccerAction(acceleration=(ball-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
+        elif self.i > 0: #a utiliser pour aller tout droit dans le cas du rebon
+            self.i -= 1
+            qte=(2*math.sqrt(2*((sup.dist_my_wall())**2)))
+            qte2=math.sqrt(qte)
+            
+            return SoccerAction(acceleration=Vector2D(sup.sens*qte2,0)) #aller tout droit aprés le rebond
+        else :
+            self.i+=1
+            return SoccerAction(acceleration=Vector2D(0,0)) #on reste immobile au début     
+
 
 class Move(object): #MOVE et SHOOT copié du cours mode tevyas zat n chikh hhh et je sais pas pk on nous a demandé de les mettre dans un fichier actions.py  or qu'on nous a demandé d'avoir juste les 3 dans notre dossier.
     def __init__( self ,SupState):
