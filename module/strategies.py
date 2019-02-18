@@ -65,6 +65,10 @@ class SoloStrategy(Strategy):
         
     def compute_strategy(self, state, id_team, id_player):
         ball=state.ball.position
+        player=state.player_state(id_team,id_player).position
+        if player.distance(ball) > (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+            return SoccerAction(acceleration=ball-player)
+        ball=state.ball.position
         sup=SupState(state,id_team,id_player)
         if self.i == 0 :
             if sup.dist_my_but()<settings.GAME_WIDTH//5 and sup.can_shoot() :
