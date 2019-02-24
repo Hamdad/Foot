@@ -10,13 +10,6 @@ class RandomStrategy(Strategy):
         # id_player starts at 0
        	return SoccerAction(Vector2D.create_random(-1.,1.),Vector2D.create_random(-1.,1.))
 
-
-"""class Defense(Strategy):
-	def __init__(self, name="defense"):
-		Strategy.__init__(self, name)
-	def compute_strategy(self,state, idteam, idplayer):
-"""
-
                                                                                                                                                   
 class FonceurStrategy(Strategy):
     def __init__(self):
@@ -98,10 +91,10 @@ class DefenseStrategy(Strategy):
 
     def compute_strategy(self, state, id_team, id_player):
         sup=SupState(state,id_team,id_player)
-        centre=Vector2D(4*settings.GAME_WIDTH/5,sup.ball_position().y)
+        centre=Vector2D(4*settings.GAME_WIDTH/5,sup.ball_position().y) if sup.sens == -1 else Vector2D(settings.GAME_WIDTH/5,sup.ball_position().y)
         #print(state.ball)
         if sup.can_shoot():
-            return SoccerAction(shoot=  (sup.co_player_pos.position - sup.my_position)*10 , acceleration = centre - sup.my_position)
+            return SoccerAction(shoot=  (sup.co_player_pos.position - sup.my_position)*1000 , acceleration = centre - sup.my_position)
         if sup.proche_ball():
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
         if (sup.predict_ball().x > 3 * settings.GAME_WIDTH/4 and sup.sens==-1) or ( sup.predict_ball().x < settings.GAME_WIDTH/4 and sup.sens==1):
@@ -110,11 +103,6 @@ class DefenseStrategy(Strategy):
         
         
         
-        """if sup.dist_ball()<settings.GAME_WIDTH/6:
-            return SoccerAction(shoot=sup.but_adv-sup.my_position,acceleration=sup.ball_position()-sup.my_position)
-        return SoccerAction(acceleration=centre-sup.my_position)
-        """
-    
 class SoloStrategy2(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Test")
@@ -163,7 +151,7 @@ class SoloStrategy2(Strategy):
                           if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #j'ai l'autorisation pour tirer
                               return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #je tire
                           else:
-                              return SoccerAction(shoot=(sup.but_adv-sup.my_position).norm_max(10)) #je drible ac la balle 
+                              return SoccerAction(shoot=(sup.but_adv-sup.my_position).norm_max(10), acceleration = sup.predict_ball() - sup.my_position) #je drible ac la balle 
                     else:
                           if sup.autor_attaq():
                               return SoccerAction(acceleration=(ball-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
@@ -177,9 +165,11 @@ class SoloStrategy2(Strategy):
             qte2=math.sqrt(qte)
             
             return SoccerAction(acceleration=Vector2D(sup.sens*qte2,0)) #aller tout droit aprés le rebond
-        """else :
+        else :
             self.i+=1
-            return SoccerAction(acceleration=Vector2D(0,0)) #on reste immobile au début      """
+            if sup.can_shoot():
+                return SoccerAction(shoot = (sup.but_adv-sup.my_position).norm_max(10), acceleration =  sup.predict_ball() - sup.my_position)
+            return SoccerAction(acceleration= sup.predict_ball() - sup.my_position) #on reste immobile au début      
 
 
 

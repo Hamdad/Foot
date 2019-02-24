@@ -11,7 +11,7 @@ if __name__ == '__main__':
     team2 = get_team(2)
     
     # Create a match 
-    simulation1 = Simulation(team1,team2)
+    simulation1 = Simulation(team2,team1)
     
     # Simulate and display the match
     show_simu(simulation1)
