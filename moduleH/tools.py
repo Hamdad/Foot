@@ -11,25 +11,21 @@ class SupState(object):
 		#recup joueur
 		self.all_players = self.state.players
 		self.co_players = [p  for p in self.all_players if (p[0] == self.key[0] and p[1] != self.key[1])]
-		if len(self.co_players)==1 :
+		if len(self.co_players)>=1 :
 			self.co_player = self.co_players[0]
-			self.co_player_pos = self.state.player_state(self.co_player[0],self.co_player[1])
+			self.co_player_pos = self.state.player_state(self.co_player[0],self.co_player[1]).position
 		self.adv_players = [p  for p in self.all_players if p[0] != self.key[0]]
+		self.adv_players_pos = [self.state.player_state(p[0],p[1]).position for p in self.adv_players]
 		#variable pour avoir le sens pour pouvoir l'utiliser lors de changement ...
 		self.sens = 1 if self.key[0] == 1 else -1
 
     #si le joueur peut tirer METHODEEEEEEEEEEEE
 		self.my_position = self.state.player_state(self.key[0], self.key[1]).position
-	#	|self.ball_position = c
-    	#	|self.can_shoot = True if self.my_position.distance(self.ball_position) <= (settings.PLAYER_RADIUS + settings.BALL_RADIUS) else False
 		#self.v_ball = self.state.ball.vitesse
     	#a revoir sans pitié
          # |self.adv_on_right = 1 if self.state.player_state(self.adv_players[0][0], self.adv_players[0][1]).position.y > self.my_position.y else -1
 		self.my_v = self.state.player_state(self.key[0], self.key[1]).vitesse
-		#est proche de la balle
-	#	|self.near_ball = True if self.my_position.distance(self.ball_position) < settings.BALL_RADIUS else False
-
-
+	
 #    @property
 	def proche_ball(self):
 		me_ball = self.dist_ball()
@@ -40,33 +36,22 @@ class SupState(object):
 		return True
     
     
-    
-   # def ball_dir(self):
-    #    return self.position-
-    
-    
-  #  def infront(self):
-   #     for player in self.adv_player:
-            
-            
-#      def can_sh  
-	"""def advfront(self):
-        for player in self.adv_players:
-            if player.position.x>self.my_position.x:
-                if player.position.y=self.my_position.y"""
-
 	@property
 	def have_ball(self):
-        	return self.my_position.distance(self.ball_position) < 1
+		return self.my_position.distance(self.ball_position) < 1
 
 
 	def ball_position(self):
-            return self.state.ball.position
+		return self.state.ball.position
 
-	def can_shoot(self):
-            if self.my_position.distance(self.ball_position()) < (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
-                return True
-            return False
+	def can_shoot(self,position = None,ballpos = None):
+		if position is None :
+			position = self.my_position
+		if ballpos is None :
+			ballpos = self.ball_position()
+		if position.distance(ballpos) < (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+			return True
+		return False
 
 
 	def v_ball(self):
@@ -134,17 +119,31 @@ class SupState(object):
 
 
 	def autor_attaq(self):     
-         return (self.ball_position().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.ball_position().x>settings.GAME_WIDTH/3 and self.sens==1)
+         return (self.predict_ball().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.predict_ball().x>settings.GAME_WIDTH/3 and self.sens==1)
 
 
-	def bien_pos(self):
-         empl=Vector2D(settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
-         if self.sens==-1:
+	"""def bien_pos(self):
+         if self.sens==1:
+             empl=Vector2D(settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
+             if self.my_position.x - self.co_player_pos.x > 50 and self.my_position.x > 75 :
+                 print("          ",self.co_player_pos.x)
+                 return SoccerAction(acceleration=Vector2D(self.co_player_pos.x+50,5*settings.GAME_HEIGHT/6)-self.my_position)
              return SoccerAction(acceleration=empl-self.my_position)
          else:
              empl=Vector2D(3*settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
-             return SoccerAction(acceleration=empl-self.my_position)
-     
+             if self.co_player_pos.x - self.my_position.x > 50 and self.my_position.x > 75:
+                 print(self.co_player_pos.x)
+                 return SoccerAction(acceleration=Vector2D(self.co_player_pos.x-50,5*settings.GAME_HEIGHT/6)-self.my_position)
+             return SoccerAction(acceleration=empl-self.my_position)         """
+             
+	def bien_pos(self):
+		if self.sens==-1:
+			empl=Vector2D(self.co_player_pos.x-60,5*settings.GAME_HEIGHT/6)
+			return SoccerAction(acceleration=empl-self.my_position)
+		else:
+			empl=Vector2D(self.co_player_pos.x+60,5*settings.GAME_HEIGHT/6)
+			return SoccerAction(acceleration=empl-self.my_position)
+
 	def coeq_proche(self):
 		return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
 
@@ -203,7 +202,6 @@ class SupState(object):
 		return pp
 
 
-	#@property
 	def aller_ball(self) :
 		#les cas ou je suis proche de la balle et elle va vite?
 		k = (self.v_ball()*3+(self.ball_position() - self.my_position))
@@ -215,6 +213,13 @@ class SupState(object):
 		else :
 			return SoccerAction(acceleration=(self.ball_position() - self.my_position).normalize())
 
+	def can_shoot_lonely(self) :
+		for p in self.adv_players_pos:
+			if self.can_shoot(p):
+				return False
+		return True
+
+
 
 	def predict_ball(self):
 		norm_base = self.v_ball().norm
@@ -222,3 +227,51 @@ class SupState(object):
 		norm_fin = norm_base *2 - norm_tour
 		ball_pos_fin = self.ball_position() + (self.v_ball().normalize() * norm_fin)
 		return ball_pos_fin
+    
+	def shoot_goal(self):
+		if(self.dist_but_adv()<30): #j'ai l'autorisation pour tirer
+			return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(4)) #je tire
+        tmp = False 
+        for ppos in self.adv_players_pos:
+            if can_shoot(position = ppos,ballpos = predict_ball()):
+                return SoccoerAction(shoot=(self.but_adv - self.my_position).norm)
+		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.6))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -94,7 +94,7 @@ class DefenseStrategy(Strategy):
         centre=Vector2D(4*settings.GAME_WIDTH/5,sup.ball_position().y) if sup.sens == -1 else Vector2D(settings.GAME_WIDTH/5,sup.ball_position().y)
         #print(state.ball)
         if sup.can_shoot():
-            return SoccerAction(shoot=  (sup.co_player_pos.position - sup.my_position)*1000 , acceleration = centre - sup.my_position)
+            return SoccerAction(shoot=  (sup.co_player_pos - sup.my_position)*10 , acceleration = centre - sup.my_position)
         if sup.proche_ball():
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
         if (sup.predict_ball().x > 3 * settings.GAME_WIDTH/4 and sup.sens==-1) or ( sup.predict_ball().x < settings.GAME_WIDTH/4 and sup.sens==1):
@@ -127,31 +127,27 @@ class SoloStrategy2(Strategy):
                 if sup.my_position.y>3*settings.GAME_HEIGHT/4 or sup.my_position.y<settings.GAME_HEIGHT/4 :    #JE SUIS DANS LES DEUX QUARTS     
                     
                     if sup.can_shoot() : #je peux tirer vu que proche de la balle
-                         if(sup.dist_but_adv()<settings.GAME_WIDTH/5): #autorisation pour tirer
-                             return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #tirer vers les bois
-                         if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1):
-                            return SoccerAction(shoot=(sup.but_adv-sup.my_position))
+                         """if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #autorisation pour tirer
+                             return sup.shoot_goal()"""
+                         if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1):# aqlagh g chwaki on dois faire le rebond ahid le corner
+                            return sup.shoot_goal() #return SoccerAction(shoot=(sup.but_adv-sup.my_position))
                          else :                            
                            shoot=Shoot2(sup).to_goal2()
-                           #print(sup.dist_my_wall())
-                           self.i=int(sup.dist_my_wall())*2
+                           self.i=int(sup.dist_my_wall())
                            #if sup.proche_ball():
                            return shoot+SoccerAction(acceleration=Vector2D(2*sup.dist_my_wall()*sup.sens,0))#faire un rebond
                        
                     else:
                          if sup.autor_attaq():
-                             p=sup.co_players[0]
-                             dist=sup.state.player_state(p[0],p[1]).position.distance(sup.ball_position()) #creer méthode je suis le plus proche parmis mes coeq
-                             if(sup.dist_ball()<dist): #plus proche que le défenseur
-                                 return SoccerAction(acceleration=(ball-sup.my_position)*300)       #je peux pas tirer trop loin de la balle donc je vais vers la balle          
-                             else:
-                                 return sup.bien_pos()
+                             return SoccerAction(acceleration=(ball-sup.my_position)*300)       #je peux pas tirer trop loin de la balle donc je vais vers la balle          
+                         else:
+                             return sup.bien_pos()
                 else:
                     if sup.can_shoot() : #si je suis dans les deux quarts du milieu
                           if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #j'ai l'autorisation pour tirer
-                              return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #je tire
+                              return sup.shoot_goal()
                           else:
-                              return SoccerAction(shoot=(sup.but_adv-sup.my_position).norm_max(10), acceleration = sup.predict_ball() - sup.my_position) #je drible ac la balle 
+                              return sup.shoot_goal()+SoccerAction(acceleration = sup.predict_ball() - sup.my_position) #je drible ac la balle 
                     else:
                           if sup.autor_attaq():
                               return SoccerAction(acceleration=(ball-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
