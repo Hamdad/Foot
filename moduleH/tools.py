@@ -219,11 +219,6 @@ class SupState(object):
 				return False
 		return True
 
-	def behind(self):
-		for p in self.adv_players_pos:
-			if p.x*self.sens >= self.my_position.x*self.sens :
-				return False
-		return True
 
 
 	def predict_ball(self):
@@ -236,25 +231,29 @@ class SupState(object):
 	def shoot_goal(self):
 		if(self.dist_but_adv()<15): #j'ai l'autorisation pour tirer
 			return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(4)) #je tire
-		for ppos in self.adv_players_pos:
-			print(self.my_position.distance(ppos))
-			print((self.but_adv-self.my_position).norm_max(1.6).norm)
-			if self.my_position.distance(ppos) <= 30 and self.my_position.x*self.sens < ppos.x*self.sens :
-				return SoccerAction(shoot=(self.but_adv - self.my_position).norm_max(3))
+		if self.adv_closer_dist() < 20:
+			return SoccerAction(shoot=(self.but_adv - self.my_position).norm_max(30))
 		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.6))
     
-    
+
 
     
     
+	def someone_there(self):
+		for p in self.adv_players_pos:
+			if self.my_position.x*self.sens < p.x*self.sens:
+				return True
+		return False
     
     
     
     
-    
-    
-    
-    
+	def adv_closer_dist(self):
+		tmp=100
+		for p in self.adv_players_pos :
+			if self.my_position.distance(p) < tmp and self.my_position.x*self.sens < p.x*self.sens:
+				tmp =self.my_position.distance(p)
+		return tmp
     
     
     

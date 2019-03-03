@@ -91,7 +91,7 @@ class DefenseStrategy(Strategy):
 
     def compute_strategy(self, state, id_team, id_player):
         sup=SupState(state,id_team,id_player)
-        centre=Vector2D(4*settings.GAME_WIDTH/5,sup.ball_position().y) if sup.sens == -1 else Vector2D(settings.GAME_WIDTH/5,sup.ball_position().y)
+        centre=Vector2D(4*settings.GAME_WIDTH/5,sup.predict_ball().y) if sup.sens == -1 else Vector2D(settings.GAME_WIDTH/5,sup.predict_ball().y)
         #print(state.ball)
         if sup.can_shoot():
             return SoccerAction(shoot=  (sup.co_player_pos - sup.my_position)*10 , acceleration = centre - sup.my_position)
@@ -129,14 +129,15 @@ class SoloStrategy2(Strategy):
                     if sup.can_shoot() : #je peux tirer vu que proche de la balle
                          """if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #autorisation pour tirer
                              return sup.shoot_goal()"""
-                         if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1):# aqlagh g chwaki on dois faire le rebond ahid le corner
+                         if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1)or sup.someone_there():# aqlagh g chwaki on dois faire le rebond ahid le corner
                             return sup.shoot_goal() #return SoccerAction(shoot=(sup.but_adv-sup.my_position))
-                         else :                            
+                         elif sup.someone_there() and sup.adv_closer_dist() < sup.dist_my_wall()*2 :                            
                            shoot=Shoot2(sup).to_goal2()
                            self.i=int(sup.dist_my_wall())
                            #if sup.proche_ball():
                            return shoot+SoccerAction(acceleration=Vector2D(2*sup.dist_my_wall()*sup.sens,0))#faire un rebond
-                       
+                         else :
+                           return sup.shoot_goal()
                     else:
                          if sup.autor_attaq():
                              return SoccerAction(acceleration=(ball-sup.my_position)*300)       #je peux pas tirer trop loin de la balle donc je vais vers la balle          
@@ -144,13 +145,10 @@ class SoloStrategy2(Strategy):
                              return sup.bien_pos()
                 else:
                     if sup.can_shoot() : #si je suis dans les deux quarts du milieu
-                          if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #j'ai l'autorisation pour tirer
-                              return sup.shoot_goal()
-                          else:
-                              return sup.shoot_goal()+SoccerAction(acceleration = sup.predict_ball() - sup.my_position) #je drible ac la balle 
+                          return sup.shoot_goal()+SoccerAction(acceleration = (sup.predict_ball() - sup.my_position)*100) #je drible ac la balle 
                     else:
                           if sup.autor_attaq():
-                              return SoccerAction(acceleration=(ball-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
+                              return SoccerAction(acceleration=(sup.predict_ball()-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
                           else:
                               return sup.bien_pos()
                               
