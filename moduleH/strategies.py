@@ -54,7 +54,7 @@ class FonceurStrategy(Strategy):
 class SoloStrategy(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Test")
-        self.i=-50
+        self.i=0
         
     def compute_strategy(self, state, id_team, id_player):
         """"ball=state.ball.position
@@ -64,28 +64,30 @@ class SoloStrategy(Strategy):
         ball=state.ball.position
         sup=SupState(state,id_team,id_player)
         if self.i == 0 :
-            if sup.dist_my_but()<settings.GAME_WIDTH//5 and sup.can_shoot() :
+            if sup.dist_my_but()<settings.GAME_WIDTH//6 and sup.can_shoot() :
                 return SoccerAction(shoot=Vector2D(500*sup.sens,0))
             if sup.my_position.y>3*settings.GAME_HEIGHT/4 or sup.my_position.y<settings.GAME_HEIGHT/4 :    #JE SUIS DANS LES DEUX QUARTS              
                 if sup.can_shoot() : #je peux tirer vu que proche de la balle
                      if(sup.dist_but_adv()<settings.GAME_WIDTH/5): #autorisation pour tirer
-                         return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #tirer vers les bois
+                         return sup.shoot_goal()#tirer vers les bois
                      if (sup.my_position.x<settings.GAME_WIDTH/5 and sup.sens==-1)or(4*settings.GAME_WIDTH/5<sup.my_position.x and sup.sens==1):
-                        return SoccerAction(shoot=(sup.but_adv-sup.my_position))
-                     else :                            
+                        return sup.shoot_goal()
+                     elif sup.adv_closer_dist() <  2*sup.dist_my_wall() and sup.can_shoot_lonely():                         
                        shoot=Shoot2(sup).to_goal2()
                        #print(sup.dist_my_wall())
-                       self.i=int(sup.dist_my_wall())*2
+                       self.i=int(sup.dist_my_wall())
                        #if sup.proche_ball():
-                       return shoot+SoccerAction(acceleration=Vector2D(2*sup.dist_my_wall()*sup.sens,0))#faire un rebond
+                       return shoot+SoccerAction(acceleration=Vector2D(sup.dist_my_wall()*sup.sens,0))#faire un rebond
+                     else :
+                       return sup.shoot_goal()
                 else:
                       return SoccerAction(acceleration=(ball-sup.my_position)*300)       #je peux pas tirer trop loin de la balle donc je vais vers la balle          
             else:
                 if sup.can_shoot() : #si je suis dans les deux quarts du milieu
                       if(sup.dist_but_adv()<settings.GAME_WIDTH/6): #j'ai l'autorisation pour tirer
-                          return SoccerAction(shoot=(sup.but_adv-sup.my_position)) #je tire
+                          return sup.shoot_goal() #je tire
                       else:
-                          return SoccerAction(shoot=(sup.but_adv-sup.my_position).norm_max(10)) #je drible ac la balle 
+                          return sup.shoot_goal() #je drible ac la balle 
                 else:
                       return SoccerAction(acceleration=(ball-sup.my_position)*300)   #je vais vers la balle vu que j'ai pas d'autorisation pour tirer
         elif self.i > 0: #a utiliser pour aller tout droit dans le cas du rebon

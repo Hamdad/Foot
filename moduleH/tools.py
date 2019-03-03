@@ -126,6 +126,9 @@ class SupState(object):
 
 	def ball_position(self):
 		return self.state.ball.position
+    
+	def ball_dir(self):
+		return self.state.ball.direction
 
 	def can_shoot(self,position = None,ballpos = None):
 		if position is None :
@@ -337,25 +340,6 @@ class SupState(object):
 			if self.my_position.distance(p) < tmp and self.my_position.x*self.sens < p.x*self.sens:
 				tmp =self.my_position.distance(p)
 		return tmp
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
