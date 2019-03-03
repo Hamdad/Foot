@@ -1,6 +1,7 @@
 from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simulation, show_simu, settings
 import math
 from .tools import SupState
+
 class RandomStrategy(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Random")
@@ -9,6 +10,19 @@ class RandomStrategy(Strategy):
         # id_team is 1 or 2
         # id_player starts at 0
        	return SoccerAction(Vector2D.create_random(-1.,1.),Vector2D.create_random(-1.,1.))
+
+
+
+
+class GoTestStrategy ( Strategy ):
+    def __init__ ( self , strength = None ):
+        Strategy . __init__ ( self , "Go - getter " )
+        self . strength = strength
+    def compute_strategy ( self , state , id_team , id_player ):
+        s =SupState( state , id_team , id_player )
+        move = Move (s )
+        shoot = Shoot2(s )
+        return move . to_ball () + shoot . to_goal ( self . strength )
 
                                                                                                                                                   
 class FonceurStrategy(Strategy):
@@ -174,7 +188,7 @@ class Move(object): #MOVE et SHOOT copié du cours mode tevyas zat n chikh hhh e
     def move(self, acceleration=None):
             return SoccerAction(acceleration=acceleration)
     def to_ball(self):
-            return self.move(self.SupState.ball_dir()) 
+            return SoccerAction(acceleration=self.SupState.ball_position()-self.SupState.my_position) 
         
         
         
@@ -189,7 +203,7 @@ class Shoot2(object):
             return SoccerAction(acceleration=self.SupState.ball_position-self.SupState.my_position)
         
     def to_goal(self, strength=1):
-        return self.Shoot2((self.SupState.but_adv-self.SupState.my_position)*strength) 
+        return SoccerAction(shoot=self.SupState.but_adv-self.SupState.my_position) 
 
     def to_goal2(self): #direction de la frappe
      # return self.shoot2(direction=Vector2D(0,50))
