@@ -55,8 +55,8 @@ class GoalSearch ( object ):
             self.criterion += 1 # Increment criterion
         self.cpt_trials += 1
             # Increment number of trials
-        print ( self.cur_param , end = " ␣ ␣ ␣ ␣ " )
-        print ( " Crit : ␣ {} ␣ ␣ ␣ Cpt : ␣ {} " . format ( self.criterion , self.cpt_trials ))
+        print ( self.cur_param , end = "         " )
+        print ( " Crit :    {}        Cpt :  {} " . format ( self.criterion , self.cpt_trials ))
         if self.cpt_trials >= self.trials :
             # Save the result
             self.res[ tuple ( self.cur_param.items ())] = self.criterion * 1. / self.trials
@@ -111,10 +111,10 @@ class SupState(object):
 	
 #    @property
 	def proche_ball(self):
-		me_ball = self.dist_ball()
-		for p in self.all_players:
+		me_ball = self.predict_ball().distance(self.my_position)
+		for p in self.co_players:
 			pos_p = self.state.player_state(p[0], p[1]).position
-			if me_ball > pos_p.distance(self.ball_position()) :
+			if me_ball > pos_p.distance(self.predict_ball()) :
 				return False
 		return True
     
@@ -230,6 +230,7 @@ class SupState(object):
 			empl=Vector2D(self.co_player_pos.x+60,5*settings.GAME_HEIGHT/6)
 			return SoccerAction(acceleration=empl-self.my_position)
 
+
 	def coeq_proche(self):
 		return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
 
@@ -265,6 +266,11 @@ class SupState(object):
 		if self.my_position.y>settings.GAME_HEIGHT/2:
 			return settings.GAME_HEIGHT - self.my_position.y
 		return self.my_position.y
+
+	def dist_adv_corner(self):
+		if self.sens ==1 :
+			return settings.GAME_WIDTH - self.my_position.x
+		return self.my_position.x
 
 	@property
 	def coeq_libre(self) :
@@ -308,6 +314,8 @@ class SupState(object):
 
 
 	def predict_ball(self):
+		if self.dist_ball() < 2*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+			return self.ball_position()+self.v_ball()
 		norm_base = self.v_ball().norm
 		norm_tour = self.v_ball().norm - settings.ballBrakeSquare * self.v_ball().norm ** 2 - settings.ballBrakeConstant * self.v_ball().norm
 		norm_fin = norm_base *2 - norm_tour
@@ -315,7 +323,7 @@ class SupState(object):
 		return ball_pos_fin
     
 	def shoot_goal(self):
-		if(self.dist_but_adv()<15): #j'ai l'autorisation pour tirer
+		if(self.dist_but_adv()<40): #j'ai l'autorisation pour tirer
 			return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(4)) #je tire
 		if self.adv_closer_dist() < 20:
 			return SoccerAction(shoot=(self.but_adv - self.my_position).norm_max(30))
@@ -341,7 +349,14 @@ class SupState(object):
 				tmp =self.my_position.distance(p)
 		return tmp
     
-    
+	def def_bonne_pos(self,x=None):
+		if x is None:            
+			x=4*settings.GAME_WIDTH/5 if self.sens==-1 else settings.GAME_WIDTH/5
+            
+		a=((self.ball_position().y-self.my_but.y)/(self.ball_position().x-self.my_but.x))
+		b=(self.my_but.y-a*(self.my_but.x))
+		y=a*x+b
+		return Vector2D(x,y)
     
     
     
