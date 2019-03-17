@@ -1,4 +1,4 @@
-from moduleH.strategies import SoloStrategy3,SoloStrategy2, FonceurStrategy, DefenseStrategy,DefenseStrategy2, SoloStrategy
+from moduleH.strategies import DefenseStrategy4,SoloStrategy3,SoloStrategy2, FonceurStrategy, DefenseStrategy,DefenseStrategy2, SoloStrategy
 from soccersimulator import SoccerTeam
 
 
@@ -15,7 +15,7 @@ def get_team(nb_players):
         team.add("F",FonceurStrategy())
     if nb_players == 4:
         team.add("S3",SoloStrategy3())
-        team.add("D",DefenseStrategy())
+        team.add("D",DefenseStrategy4())
         team.add("G",DefenseStrategy2())
         team.add("A",SoloStrategy2())
           
