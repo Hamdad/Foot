@@ -101,8 +101,26 @@ class SoloStrategy(Strategy):
         else :
             self.i+=1
             return SoccerAction(acceleration=Vector2D(0,0)) #on reste immobile au début 
-
+        
+        
 class DefenseStrategy(Strategy):
+    def __init__(self):
+        Strategy.__init__(self, "Defense")
+        #self.i=-50
+
+    def compute_strategy(self, state, id_team, id_player):
+        sup=SupState(state,id_team,id_player)
+        centre=sup.def_bonne_pos()
+        if sup.can_shoot():
+            return SoccerAction(shoot=  (sup.co_player_pos - sup.my_position)*10 , acceleration = centre - sup.my_position)
+        if sup.proche_ball():
+            return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
+        if (sup.predict_ball().x > 5 * settings.GAME_WIDTH/8 and sup.sens==-1) or ( sup.predict_ball().x < 3* settings.GAME_WIDTH/8 and sup.sens==1):
+            return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
+        return SoccerAction( acceleration = centre - sup.my_position)
+    
+    
+class DefenseStrategy4(Strategy):
     def __init__(self):
         Strategy.__init__(self, "Defense")
         #self.i=-50
