@@ -110,14 +110,17 @@ class DefenseStrategy(Strategy):
     def compute_strategy(self, state, id_team, id_player):
         sup=SupState(state,id_team,id_player)
         centre=sup.def_bonne_pos()
+        if sup.sens==-1: 
+            empl=Vector2D(settings.GAME_WIDTH/3,5*settings.GAME_HEIGHT/6)
+        else:
+            empl=Vector2D(4*settings.GAME_WIDTH/6,5*settings.GAME_HEIGHT/6)
         if sup.can_shoot():
-            return SoccerAction(shoot=  (sup.co_player_pos - sup.my_position)*10 , acceleration = centre - sup.my_position)
+            return SoccerAction(shoot=empl-sup.my_position , acceleration = centre - sup.my_position)
         if sup.proche_ball():
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
         if (sup.predict_ball().x > 5 * settings.GAME_WIDTH/8 and sup.sens==-1) or ( sup.predict_ball().x < 3* settings.GAME_WIDTH/8 and sup.sens==1):
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
         return SoccerAction( acceleration = centre - sup.my_position)
-        
         
 class DefenseStrategy2(Strategy):
     def __init__(self):
@@ -128,7 +131,7 @@ class DefenseStrategy2(Strategy):
         sup=SupState(state,id_team,id_player)
         centre=sup.def_bonne_pos(x=29*settings.GAME_WIDTH/30 if sup.sens==-1 else settings.GAME_WIDTH/30)
         if sup.can_shoot():
-            return SoccerAction(shoot= (sup.but_adv-sup.predict_ball()), acceleration = centre - sup.my_position)
+            return SoccerAction(shoot= (sup.but_adv-sup.my_position), acceleration = centre - sup.my_position)
         if sup.proche_ball():
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
 
