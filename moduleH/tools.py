@@ -229,7 +229,14 @@ class SupState(object):
 		else:
 			empl=Vector2D(self.co_player_pos.x+60,5*settings.GAME_HEIGHT/6)
 			return SoccerAction(acceleration=empl-self.my_position)
-
+	
+	def bien_pos2(self):
+		if self.sens==-1:
+			empl=Vector2D(settings.GAME_WIDTH/3,settings.GAME_HEIGHT/6)
+			return SoccerAction(acceleration=empl-self.my_position)
+		else:
+			empl=Vector2D(4*settings.GAME_WIDTH/6,settings.GAME_HEIGHT/6)
+			return SoccerAction(acceleration=empl-self.my_position) 
 
 	def coeq_proche(self):
 		return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
