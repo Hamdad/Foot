@@ -118,6 +118,10 @@ class SupState(object):
 				return False
 		return True
     
+	def pos_coplayer(self,i):
+		player=self.co_players[i]
+		return  self.state.player_state(player[0],player[1]).position
+    
     
 	@property
 	def have_ball(self):
@@ -202,7 +206,19 @@ class SupState(object):
                 return [[l1,l2,l3,l4],[l5]]
 
 
-
+	def drible(self) :
+		adv_pos =self.pos_adv_nearby()
+		#print self.state.player_state(self.key[0], self.key[1])._rd_angle(Vector2D(1, 1), 90, 1)
+		if self.sens == 1 :
+			if self.my_position.y < adv_pos.y :
+				return SoccerAction(shoot=Vector2D(10, -10).norm_max(1.7))
+			else :
+				return SoccerAction(shoot=self.sens*Vector2D(10, 10).norm_max(1.7))
+		elif self.sens == -1 :
+			if self.my_position.y< adv_pos.y :
+				return SoccerAction(shoot=self.sens*Vector2D(10, 10).norm_max(1.7))
+			else:
+				return SoccerAction(shoot=self.sens*Vector2D(10, -10).norm_max(1.7))
 
 	def autor_attaq(self):     
          return (self.predict_ball().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.predict_ball().x>settings.GAME_WIDTH/3 and self.sens==1)
@@ -222,12 +238,12 @@ class SupState(object):
                  return SoccerAction(acceleration=Vector2D(self.co_player_pos.x-50,5*settings.GAME_HEIGHT/6)-self.my_position)
              return SoccerAction(acceleration=empl-self.my_position)         """
              
-	def bien_pos(self):
+	def bien_pos(self,i=0,j=0):
 		if self.sens==-1:
-			empl=Vector2D(self.co_player_pos.x-60,5*settings.GAME_HEIGHT/6)
+			empl=Vector2D(self.pos_coplayer(i).x-60,5*settings.GAME_HEIGHT/6) if j==0 else Vector2D(self.pos_coplayer(i).x-60,settings.GAME_HEIGHT/3) 
 			return SoccerAction(acceleration=empl-self.my_position)
 		else:
-			empl=Vector2D(self.co_player_pos.x+60,5*settings.GAME_HEIGHT/6)
+			empl=Vector2D(self.pos_coplayer(i).x+60,5*settings.GAME_HEIGHT/6) if j==0 else Vector2D(self.pos_coplayer(i).x+60,settings.GAME_HEIGHT/3)
 			return SoccerAction(acceleration=empl-self.my_position)
 
 
@@ -256,11 +272,11 @@ class SupState(object):
 
 
 	def pos_adv_nearby(self):
-     		return min([(self.player.distance(player),player) for player in self.adv_players])[1]
+     		return min([(self.my_position.distance(player),player) for player in self.adv_players_pos if self.my_position.x*self.sens<player.x*self.sens])[1]
 
 
 	def dist_adv_nearby(self):
-		return min([(self.player.distance(player),player) for player in self.adv_players])[0]
+		return min([(self.my_position(player),player) for player in self.adv_players])[0]
     
 	def dist_my_wall(self):
 		if self.my_position.y>settings.GAME_HEIGHT/2:
@@ -312,22 +328,29 @@ class SupState(object):
 		return True
 
 
-
+	def contre_rebond(self,y):
+		if y>settings.GAME_HEIGHT:
+			return 2*settings.GAME_HEIGHT-y       
+		if y<0:
+			return -1*y
+  
 	def predict_ball(self):
-		if self.dist_ball() < 2*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+		if self.dist_ball() < 4*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
 			return self.ball_position()+self.v_ball()
 		norm_base = self.v_ball().norm
 		norm_tour = self.v_ball().norm - settings.ballBrakeSquare * self.v_ball().norm ** 2 - settings.ballBrakeConstant * self.v_ball().norm
 		norm_fin = norm_base *2 - norm_tour
 		ball_pos_fin = self.ball_position() + (self.v_ball().normalize() * norm_fin)
+		if ball_pos_fin.y>settings.GAME_HEIGHT or ball_pos_fin.y<0:
+			ball_pos_fin.y=self.contre_rebond(ball_pos_fin.y)
 		return ball_pos_fin
     
 	def shoot_goal(self):
 		if(self.dist_but_adv()<40): #j'ai l'autorisation pour tirer
 			return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(4)) #je tire
 		if self.adv_closer_dist() < 20:
-			return SoccerAction(shoot=(self.but_adv - self.my_position).norm_max(30))
-		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.6))
+			return self.drible()+SoccerAction(acceleration=self.predict_ball() - self.my_position)
+		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.3))
     
 
 
@@ -345,9 +368,10 @@ class SupState(object):
 	def adv_closer_dist(self):
 		tmp=100
 		for p in self.adv_players_pos :
-			if self.my_position.distance(p) < tmp and self.my_position.x*self.sens < p.x*self.sens:
+			if self.my_position.distance(p) < tmp and self.my_position.x*self.sens < p.x*self.sens and -10 < self.my_position.y-p.y < 10:
 				tmp =self.my_position.distance(p)
 		return tmp
+    
     
 	def def_bonne_pos(self,x=None):
 		if x is None:            
