@@ -7,8 +7,8 @@ if __name__ == '__main__':
     from moduleH import get_team
     
     #Test avec 1 et 2 joueurs
-    team1 = get_team(3)
-    team2 = get_team(2)
+    team1 = get_team(1)
+    team2 = get_team(4)
     
     # Create a match 
     simulation1 = Simulation(team2,team1)
