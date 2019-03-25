@@ -376,6 +376,8 @@ class SupState(object):
 	def def_bonne_pos(self,x=None):
 		if x is None:            
 			x=4*settings.GAME_WIDTH/5 if self.sens==-1 else settings.GAME_WIDTH/5
+		elif x==9:
+			x=9*settings.GAME_WIDTH/10 if self.sens==-1 else settings.GAME_WIDTH/10              
             
 		a=((self.ball_position().y-self.my_but.y)/(self.ball_position().x-self.my_but.x))
 		b=(self.my_but.y-a*(self.my_but.x))
