@@ -348,7 +348,7 @@ class SupState(object):
 	def shoot_goal(self):
 		if(self.dist_but_adv()<40): #j'ai l'autorisation pour tirer
 			return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(4)) #je tire
-		if self.adv_closer_dist() < 20:
+		if self.adv_closer_dist() < 30:
 			return self.drible()+SoccerAction(acceleration=self.predict_ball() - self.my_position)
 		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.3))
     
