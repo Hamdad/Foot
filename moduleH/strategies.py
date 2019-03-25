@@ -127,6 +127,22 @@ class DefenseStrategy(Strategy):
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
         return SoccerAction( acceleration = centre - sup.my_position)
         
+    
+class DefenseStrategy2(Strategy):
+    def __init__(self):
+        Strategy.__init__(self, "Defense2")
+        #self.i=-50
+
+    def compute_strategy(self, state, id_team, id_player):
+        sup=SupState(state,id_team,id_player)
+        centre=sup.def_bonne_pos(9)
+        if sup.can_shoot():
+            return SoccerAction(shoot=(sup.pos_coplayer(0) - sup.my_position).norm_max(sup.my_position.distance(sup.pos_coplayer(0))/10) , acceleration = centre - sup.my_position)
+        if sup.proche_ball():
+            return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
+        if (sup.predict_ball().x > 5 * settings.GAME_WIDTH/8 and sup.sens==-1) or ( sup.predict_ball().x < 3* settings.GAME_WIDTH/8 and sup.sens==1):
+            return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
+        return SoccerAction( acceleration = centre - sup.my_position)    
         
 class GardienStrategy(Strategy):
     def __init__(self):
