@@ -91,7 +91,6 @@ class SupState(object):
 		self.key = (idteam, idplayer)
 		self.but_adv = Vector2D(settings.GAME_WIDTH, settings.GAME_HEIGHT/2) if self.key[0] == 1 else Vector2D(0, settings.GAME_HEIGHT/2)
 		self.my_but = Vector2D(0, settings.GAME_HEIGHT/2) if self.key[0] == 1 else Vector2D(settings.GAME_WIDTH, settings.GAME_HEIGHT/2)
-		#recup joueur
 		self.all_players = self.state.players
 		self.co_players = [p  for p in self.all_players if (p[0] == self.key[0] and p[1] != self.key[1])]
 		if len(self.co_players)>=1 :
@@ -99,13 +98,8 @@ class SupState(object):
 			self.co_player_pos = self.state.player_state(self.co_player[0],self.co_player[1]).position
 		self.adv_players = [p  for p in self.all_players if p[0] != self.key[0]]
 		self.adv_players_pos = [self.state.player_state(p[0],p[1]).position for p in self.adv_players]
-		#variable pour avoir le sens pour pouvoir l'utiliser lors de changement ...
 		self.sens = 1 if self.key[0] == 1 else -1
-
-    #si le joueur peut tirer METHODEEEEEEEEEEEE
 		self.my_position = self.state.player_state(self.key[0], self.key[1]).position
-		#self.v_ball = self.state.ball.vitesse
-    	#a revoir sans pitié
          # |self.adv_on_right = 1 if self.state.player_state(self.adv_players[0][0], self.adv_players[0][1]).position.y > self.my_position.y else -1
 		self.my_v = self.state.player_state(self.key[0], self.key[1]).vitesse
 	
@@ -117,6 +111,7 @@ class SupState(object):
 			if me_ball > pos_p.distance(self.predict_ball()) :
 				return False
 		return True
+
     
 	def pos_coplayer(self,i):
 		player=self.co_players[i]
@@ -130,9 +125,11 @@ class SupState(object):
 
 	def ball_position(self):
 		return self.state.ball.position
+
     
 	def ball_dir(self):
 		return self.state.ball.direction
+
 
 	def can_shoot(self,position = None,ballpos = None):
 		if position is None :
@@ -147,7 +144,8 @@ class SupState(object):
 	def v_ball(self):
             return self.state.ball.vitesse
 
-	def eclatement(self):
+
+	"""def eclatement(self):
             l1=[] 
             l2=[] 
             l3=[] 
@@ -204,7 +202,7 @@ class SupState(object):
                                     #a completer
              
                 return [[l1,l2,l3,l4],[l5]]
-
+"""
 
 	def drible(self) :
 		adv_pos =self.pos_adv_nearby()
@@ -220,23 +218,10 @@ class SupState(object):
 			else:
 				return SoccerAction(shoot=self.sens*Vector2D(10, -10).norm_max(1.7))
 
+
 	def autor_attaq(self):     
          return (self.predict_ball().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.predict_ball().x>settings.GAME_WIDTH/3 and self.sens==1)
 
-
-	"""def bien_pos(self):
-         if self.sens==1:
-             empl=Vector2D(settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
-             if self.my_position.x - self.co_player_pos.x > 50 and self.my_position.x > 75 :
-                 print("          ",self.co_player_pos.x)
-                 return SoccerAction(acceleration=Vector2D(self.co_player_pos.x+50,5*settings.GAME_HEIGHT/6)-self.my_position)
-             return SoccerAction(acceleration=empl-self.my_position)
-         else:
-             empl=Vector2D(3*settings.GAME_WIDTH/4,5*settings.GAME_HEIGHT/6)
-             if self.co_player_pos.x - self.my_position.x > 50 and self.my_position.x > 75:
-                 print(self.co_player_pos.x)
-                 return SoccerAction(acceleration=Vector2D(self.co_player_pos.x-50,5*settings.GAME_HEIGHT/6)-self.my_position)
-             return SoccerAction(acceleration=empl-self.my_position)         """
              
 	def bien_pos(self,i=0,j=0):
 		if self.sens==-1:
@@ -250,8 +235,10 @@ class SupState(object):
 	def coeq_proche(self):
 		return [p for p in self.co_players if self.my_position.distance(self.state.player_state(p[0], p[1]).position) < (settings.GAME_WIDTH/2)] #A revoir et werna mlih ^-^
 
+
 	def my_vit(self):
 		return self.state.player_state(self.key[0], self.key[1]).vitesse
+
 
 	def near_ball(self):
 		if self.my_position.distance(self.ball_position) < settings.BALL_RADIUS:
@@ -277,16 +264,19 @@ class SupState(object):
 
 	def dist_adv_nearby(self):
 		return min([(self.my_position(player),player) for player in self.adv_players])[0]
+
     
 	def dist_my_wall(self):
 		if self.my_position.y>settings.GAME_HEIGHT/2:
 			return settings.GAME_HEIGHT - self.my_position.y
 		return self.my_position.y
 
+
 	def dist_adv_corner(self):
 		if self.sens ==1 :
 			return settings.GAME_WIDTH - self.my_position.x
 		return self.my_position.x
+
 
 	@property
 	def coeq_libre(self) :
@@ -321,6 +311,7 @@ class SupState(object):
 		else :
 			return SoccerAction(acceleration=(self.ball_position() - self.my_position).normalize())
 
+
 	def can_shoot_lonely(self) :
 		for p in self.adv_players_pos:
 			if self.can_shoot(p):
@@ -333,6 +324,7 @@ class SupState(object):
 			return 2*settings.GAME_HEIGHT-y       
 		if y<0:
 			return -1*y
+
   
 	def predict_ball(self):
 		if self.dist_ball() < 4*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
@@ -344,6 +336,7 @@ class SupState(object):
 		if ball_pos_fin.y>settings.GAME_HEIGHT or ball_pos_fin.y<0:
 			ball_pos_fin.y=self.contre_rebond(ball_pos_fin.y)
 		return ball_pos_fin
+
     
 	def shoot_goal(self):
 		if(self.dist_but_adv()<40): #j'ai l'autorisation pour tirer
@@ -351,17 +344,13 @@ class SupState(object):
 		if self.adv_closer_dist() < 30:
 			return self.drible()+SoccerAction(acceleration=self.predict_ball() - self.my_position)
 		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.3))
-    
 
-
-    
     
 	def someone_there(self):
 		for p in self.adv_players_pos:
 			if self.my_position.x*self.sens < p.x*self.sens:
 				return True
-		return False
-    
+		return False    
     
     
     
@@ -383,7 +372,3 @@ class SupState(object):
 		b=(self.my_but.y-a*(self.my_but.x))
 		y=a*x+b
 		return Vector2D(x,y)
-    
-    
-    
-    
