@@ -1,13 +1,13 @@
 #from "notre dossier" import "nos strategies"
 
-
+import Nasser
 
 if __name__ == '__main__':
     from soccersimulator import Simulation, show_simu
     from moduleH import get_team
     
     #Test avec 1 et 2 joueurs
-    team1 = get_team(2)
+    team1 = Nasser.get_team(4)
     team2 = get_team(4)
     
     # Create a match 

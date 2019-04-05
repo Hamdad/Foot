@@ -2,7 +2,7 @@
 
 from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simulation, show_simu, settings
 from sklearn.model_selection import ParameterGrid
-
+import time
 
 class GoalSearch ( object ):
     def __init__ ( self , strategy , params , simu = None , trials =20 ,
@@ -251,6 +251,10 @@ class SupState(object):
 
 
 	def dist_but_adv(self):
+		if self.my_position.y>60:
+			return self.my_position.distance(Vector2D(self.but_adv.x,self.but_adv.y-15))
+		elif self.my_position.y<30:
+			return self.my_position.distance(Vector2D(self.but_adv.x,self.but_adv.y+15))
 		return self.my_position.distance(self.but_adv)
 
 
@@ -319,28 +323,49 @@ class SupState(object):
 		return True
 
 
-	def contre_rebond(self,y):
-		if y>settings.GAME_HEIGHT:
-			return 2*settings.GAME_HEIGHT-y       
-		if y<0:
-			return -1*y
+	def contre_rebond(self,x=None,y=None):
+		if x is None :
+			if y>settings.GAME_HEIGHT:
+				return 2*settings.GAME_HEIGHT-y       
+			if y<0:
+				return -1*y
+		else :
+			#print("athayaa ",x)
+			#time.sleep(4)
+			if x>=settings.GAME_WIDTH:
+				return 2*settings.GAME_WIDTH-x       
+			if x<=0:
+				return -1*x
+            
 
   
 	def predict_ball(self):
-		if self.dist_ball() < 4*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+		if self.dist_ball() < 3*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
 			return self.ball_position()+self.v_ball()
 		norm_base = self.v_ball().norm
-		norm_tour = self.v_ball().norm - settings.ballBrakeSquare * self.v_ball().norm ** 2 - settings.ballBrakeConstant * self.v_ball().norm
-		norm_fin = norm_base *2 - norm_tour
+		"""if self.v_ball().norm>2.2:	
+			var_tmp=10
+			#print("passe par la ")
+		elif self.v_ball().norm>1.0001 :
+			var_tmp=6
+			#print(self.v_ball().norm)
+		else:
+			var_tmp=3"""
+		norm_tour = self.v_ball().norm - settings.ballBrakeSquare* self.v_ball().norm ** 2 - settings.ballBrakeConstant * self.v_ball().norm
+		norm_fin = norm_base *3 - norm_tour
 		ball_pos_fin = self.ball_position() + (self.v_ball().normalize() * norm_fin)
 		if ball_pos_fin.y>settings.GAME_HEIGHT or ball_pos_fin.y<0:
-			ball_pos_fin.y=self.contre_rebond(ball_pos_fin.y)
+			ball_pos_fin.y=self.contre_rebond(y=ball_pos_fin.y)
+		if ball_pos_fin.x>=settings.GAME_WIDTH or ball_pos_fin.x<=0:
+			ball_pos_fin.x=self.contre_rebond(x=ball_pos_fin.x)
+		"""if ball_pos_fin.distance(self.my_but)< 30:
+			return (self.my_but-self.ball_position()).scale(0.5)"""
 		return ball_pos_fin
 
     
 	def shoot_goal(self):
-		if(self.dist_but_adv()<40): #j'ai l'autorisation pour tirer
-			return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(4)) #je tire
+		if(self.dist_but_adv()<45): #j'ai l'autorisation pour tirer
+			return SoccerAction(shoot=(self.but_adv-self.my_position)*0.1) #je tire
 		if self.adv_closer_dist() < 30:
 			return self.drible()+SoccerAction(acceleration=self.predict_ball() - self.my_position)
 		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.3))
@@ -360,14 +385,9 @@ class SupState(object):
 			if self.my_position.distance(p) < tmp and self.my_position.x*self.sens < p.x*self.sens and -10 < self.my_position.y-p.y < 10:
 				tmp =self.my_position.distance(p)
 		return tmp
+
     
-    
-	def def_bonne_pos(self,x=None):
-		if x is None:            
-			x=4*settings.GAME_WIDTH/5 if self.sens==-1 else settings.GAME_WIDTH/5
-		elif x==9:
-			x=9*settings.GAME_WIDTH/10 if self.sens==-1 else settings.GAME_WIDTH/10              
-            
+	def def_bonne_pos(self,x):              
 		a=((self.ball_position().y-self.my_but.y)/(self.ball_position().x-self.my_but.x))
 		b=(self.my_but.y-a*(self.my_but.x))
 		y=a*x+b
