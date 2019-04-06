@@ -267,7 +267,7 @@ class SupState(object):
 
 
 	def dist_adv_nearby(self):
-		return min([(self.my_position(player),player) for player in self.adv_players])[0]
+		return min([(self.my_position.distance(player),player) for player in self.adv_players_pos])[0]
 
     
 	def dist_my_wall(self):
@@ -333,14 +333,14 @@ class SupState(object):
 			#print("athayaa ",x)
 			#time.sleep(4)
 			if x>=settings.GAME_WIDTH:
-				return 2*settings.GAME_WIDTH-x       
+				return settings.GAME_WIDTH       
 			if x<=0:
-				return -1*x
+				return 0
             
 
   
 	def predict_ball(self):
-		if self.dist_ball() < 3*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+		if self.dist_ball() < 4*(settings.PLAYER_RADIUS + settings.BALL_RADIUS):
 			return self.ball_position()+self.v_ball()
 		norm_base = self.v_ball().norm
 		"""if self.v_ball().norm>2.2:	
@@ -352,7 +352,7 @@ class SupState(object):
 		else:
 			var_tmp=3"""
 		norm_tour = self.v_ball().norm - settings.ballBrakeSquare* self.v_ball().norm ** 2 - settings.ballBrakeConstant * self.v_ball().norm
-		norm_fin = norm_base *3 - norm_tour
+		norm_fin = norm_base *2 - norm_tour
 		ball_pos_fin = self.ball_position() + (self.v_ball().normalize() * norm_fin)
 		if ball_pos_fin.y>settings.GAME_HEIGHT or ball_pos_fin.y<0:
 			ball_pos_fin.y=self.contre_rebond(y=ball_pos_fin.y)
@@ -387,8 +387,30 @@ class SupState(object):
 		return tmp
 
     
-	def def_bonne_pos(self,x):              
-		a=((self.ball_position().y-self.my_but.y)/(self.ball_position().x-self.my_but.x))
-		b=(self.my_but.y-a*(self.my_but.x))
+	def def_bonne_pos(self,x=None):
+		if self.ball_position().x < settings.GAME_WIDTH/3:
+			if self.predict_ball().y>(4*settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y+ 2*settings.GAME_GOAL_HEIGHT/4
+			elif self.predict_ball().y>(3*settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y+ settings.GAME_GOAL_HEIGHT/4
+			elif self.predict_ball().y>(2*settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y
+			elif self.predict_ball().y>(settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y-settings.GAME_GOAL_HEIGHT/4
+			else:
+				pos_but=self.my_but.y- 2*settings.GAME_GOAL_HEIGHT/4            
+		else :
+			if self.ball_position().y>(4*settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y+ 2*settings.GAME_GOAL_HEIGHT/4
+			elif self.ball_position().y>(3*settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y+ settings.GAME_GOAL_HEIGHT/4
+			elif self.ball_position().y>(2*settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y
+			elif self.ball_position().y>(settings.GAME_HEIGHT/5):
+				pos_but=self.my_but.y-settings.GAME_GOAL_HEIGHT/4
+			else:
+				pos_but=self.my_but.y- 2*settings.GAME_GOAL_HEIGHT/4
+		a=((self.ball_position().y-pos_but)/(self.ball_position().x-self.my_but.x))
+		b=(pos_but-a*(self.my_but.x))
 		y=a*x+b
 		return Vector2D(x,y)

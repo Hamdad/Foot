@@ -123,7 +123,7 @@ class GardienStrategy(Strategy):
         centre=sup.def_bonne_pos(x=29*settings.GAME_WIDTH/30 if sup.sens==-1 else settings.GAME_WIDTH/30)
         if sup.can_shoot():
             return SoccerAction(shoot= ((sup.pos_coplayer(2) - sup.my_position)), acceleration = centre - sup.my_position)
-        if sup.proche_ball():
+        if sup.predict_ball().distance(sup.my_position)< 5 :#or ( sup.dist_adv_nearby()< 30 and sup.pos_adv_nearby().distance(sup.ball_position())> sup.dist_ball() and sup.dist_ball() < 15 and sup.ball_position().x < settings.GAME_WIDTH/5):#sup.proche_ball():
             return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
         return SoccerAction( acceleration = centre - sup.my_position)
     

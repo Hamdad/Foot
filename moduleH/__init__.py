@@ -13,7 +13,6 @@ def get_team(nb_players):
     if nb_players == 4:
         team.add("S",SoloStrategy2())
         team.add("###",DefenseStrategy())
-        team.add("..",SoloStrategy())
-        #team.add("S2",SoloStrategy4())
+        team.add("S2",SoloStrategy4())
         team.add("###",GardienStrategy())
     return team
