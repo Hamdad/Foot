@@ -2,7 +2,7 @@
 
 from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam, Simulation, show_simu, settings
 from sklearn.model_selection import ParameterGrid
-import time
+#import time
 
 class GoalSearch ( object ):
     def __init__ ( self , strategy , params , simu = None , trials =20 ,
@@ -101,7 +101,7 @@ class SupState(object):
 		self.sens = 1 if self.key[0] == 1 else -1
 		self.my_position = self.state.player_state(self.key[0], self.key[1]).position
          # |self.adv_on_right = 1 if self.state.player_state(self.adv_players[0][0], self.adv_players[0][1]).position.y > self.my_position.y else -1
-		self.my_v = self.state.player_state(self.key[0], self.key[1]).vitesse
+		#self.my_v = self.state.player_state(self.key[0], self.key[1]).vitesse
 	
 #    @property
 	def proche_ball(self):
@@ -136,7 +136,7 @@ class SupState(object):
 			position = self.my_position
 		if ballpos is None :
 			ballpos = self.ball_position()
-		if position.distance(ballpos) < (settings.PLAYER_RADIUS + settings.BALL_RADIUS):
+		if position.distance(ballpos) < (settings.PLAYER_RADIUS + settings.                                                                                                                                                                                                                             BALL_RADIUS):
 			return True
 		return False
 
@@ -160,7 +160,8 @@ class SupState(object):
             l12=[]
             l13=[]
             l14=[]
-            l15=[]
+            l15=[
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ]
             l16=[]
             for player in self.all_players:
                 if player.position.x<settings.GAME_WIDTH//4:
@@ -219,9 +220,11 @@ class SupState(object):
 				return SoccerAction(shoot=self.sens*Vector2D(10, -10).norm_max(1.7))
 
 
-	def autor_attaq(self):     
-         return (self.predict_ball().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.predict_ball().x>settings.GAME_WIDTH/3 and self.sens==1)
+	"""def autor_attaq(self):     il faut pas oublier de la remettre pour le 2 V 2 
+         return (self.predict_ball().x<2*settings.GAME_WIDTH/3 and self.sens==-1)or(self.predict_ball().x>settings.GAME_WIDTH/3 and self.sens==1)"""
 
+	def autor_attaq(self):     
+         return (self.predict_ball().x<4*settings.GAME_WIDTH/5 and self.sens==-1)or(self.predict_ball().x>settings.GAME_WIDTH/5 and self.sens==1)
              
 	def bien_pos(self,i=0,j=0):
 		if self.sens==-1:
@@ -260,7 +263,62 @@ class SupState(object):
 
 	def dist_my_but(self):
 		return self.my_position.distance(self.my_but)
+    
+	def dist_my_fillet(self):
+		return settings.GAME_WIDTH/2 - self.my_position.x  if self.sens == 1 else self.my_position.x - settings.GAME_WIDTH/2 
 
+	def dist_adv_fillet(self, i =0):
+		return settings.GAME_WIDTH/2 - self.adv_players_pos[i].x  if self.sens == -1 else self.adv_players_pos[i].x - settings.GAME_WIDTH/2 
+
+	def ball_ds_mn_terrain(self):
+		if self.predict_ball().x > 90 and self.sens == -1 or self.predict_ball().x <90 and self.sens==1 :
+			return True
+		return False
+
+	def sort_des_bords(self):
+		if self.predict_ball().y >= settings.GAME_HEIGTH or self.predict_ball().y <= 0:
+			return True
+		return False
+
+	def shoot_fil(self):
+		if self.adv_players_pos[0].y < settings.GAME_HEIGHT/2:
+			#print(self.dist_adv_fillet())
+			if self.dist_adv_fillet()<20 :
+				if self.dist_wall_adv()[0] <20 :				                
+					#print( "hiii") 
+					return SoccerAction( shoot = Vector2D(90*self.sens,(self.adv_players_pos[0].y + settings.GAME_HEIGHT/2 - self.my_position.y)))
+				else : 
+					#print("hi") 
+					return SoccerAction(shoot = Vector2D(90*self.sens,(self.adv_players_pos[0].y + 2*self.dist_wall_adv()[1]/3 - self.my_position.y)))
+			else :
+				if self.dist_wall_adv()[0] <20 :				                
+					return SoccerAction( shoot = Vector2D((self.dist_my_fillet()+self.my_position.x)*self.sens,(self.adv_players_pos[0].y + settings.GAME_HEIGHT/2 - self.my_position.y)).norm_max(1.5))
+				else : 
+					return SoccerAction(shoot = Vector2D((self.dist_my_fillet()+self.my_position.x)*self.sens,(self.adv_players_pos[0].y + 2*self.dist_wall_adv()[1]/3 - self.my_position.y)).norm_max(1.5))
+		else :
+			if self.dist_adv_fillet()<20 :
+				if self.dist_wall_adv()[0] <20 :				                
+					#print("hh") 
+					return SoccerAction( shoot = Vector2D(90*self.sens,(self.adv_players_pos[0].y - settings.GAME_HEIGHT/2 - self.my_position.y)))
+				else : 
+					#print("ii") 
+					return SoccerAction(shoot = Vector2D(90*self.sens,(self.adv_players_pos[0].y - 2*self.dist_wall_adv()[1]/3 - self.my_position.y)))
+			else :
+				if self.dist_wall_adv()[0] <20 :				                
+					return SoccerAction( shoot = Vector2D((self.dist_my_fillet()+self.my_position.x)*self.sens,(self.adv_players_pos[0].y - settings.GAME_HEIGHT/2 - self.my_position.y)).norm_max(1.5))
+				else : 
+					return SoccerAction(shoot = Vector2D((self.dist_my_fillet()+self.my_position.x)*self.sens,(self.adv_players_pos[0].y - 2*self.dist_wall_adv()[1]/3 - self.my_position.y)).norm_max(1.5))  
+
+
+	"""if sup.dist_wall_adv()[0] <20 :
+                        return SoccerAction( shoot = (sup.adv_players_pos[0] + settings.GAME_HEIGHT/2 - sup.my_position)*0.1)
+                    else : 
+                        return SoccerAction(shoot = (sup.adv_players_pos[0] + 2*sup.dist_wall_adv()[1]/3 - sup.my_position)*0.1)
+                else :
+                    if sup.dist_wall_adv()[0] <20 :
+                        return SoccerAction( shoot = (sup.adv_players_pos[0] - settings.GAME_HEIGHT/2 - sup.my_position)*0.1)
+                    else : 
+                        return SoccerAction(shoot = (sup.adv_players_pos[0] - 2*sup.dist_wall_adv()[1]/3 - sup.my_position)*0.1)"""
 
 	def pos_adv_nearby(self):
      		return min([(self.my_position.distance(player),player) for player in self.adv_players_pos if self.my_position.x*self.sens<player.x*self.sens])[1]
@@ -275,6 +333,11 @@ class SupState(object):
 			return settings.GAME_HEIGHT - self.my_position.y
 		return self.my_position.y
 
+
+	def dist_wall_adv(self,i=0):
+		if self.adv_players_pos[i].y > settings.GAME_HEIGHT/2:
+			return ( settings.GAME_HEIGHT - self.adv_players_pos[i].y , self.adv_players_pos[i].y )
+		return (self.adv_players_pos[i].y , settings.GAME_HEIGHT - self.adv_players_pos[i].y  )
 
 	def dist_adv_corner(self):
 		if self.sens ==1 :
@@ -368,7 +431,7 @@ class SupState(object):
 			return SoccerAction(shoot=(self.but_adv-self.my_position)*0.1) #je tire
 		if self.adv_closer_dist() < 30:
 			return self.drible()+SoccerAction(acceleration=self.predict_ball() - self.my_position)
-		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1.3))
+		return SoccerAction(shoot=(self.but_adv-self.my_position).norm_max(1))
 
     
 	def someone_there(self):
@@ -414,3 +477,26 @@ class SupState(object):
 		b=(pos_but-a*(self.my_but.x))
 		y=a*x+b
 		return Vector2D(x,y)
+    
+"""action, bool = self.une_deux()  
+    
+	def une_deux(self, i):
+		if (self.dist_but_adv()< 45):
+			return (self.shoot_goal(), False)
+		elif une_deux_bien_pos(i) :
+			return (SoccerAction(shoot= (self.pos_coplayer(i) - self.my_position).norm_max(self.my_position.distance(self.pos_coplayer(i))/18) ), True)
+		else :
+			return (self.une_deux_marche(),False)
+        
+        
+	def une_deux_marche(self):
+		if self.adv_closer_dist() < 30 :
+			return self.drible()+SoccerAction(acceleration= self.predict_ball() - self.my_position)
+		return SoccerAction( shoot= Vector2D(100,0).norm_max(1), acceleration = Vector2D(1,0))
+    
+    
+	def une_deux_bien_pos(self,i):
+        
+        
+        
+	def une_deux_pos(self,i):"""

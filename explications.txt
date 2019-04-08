@@ -1,0 +1,31 @@
+###################################################################################"
+Question 1 : 
+
+	en essayant d'aller et de tirer directement vers la balle j'ai remarqué que la ball a ralenti bcp j'ai donc decidé de me faire des passes jusqu'a a atteindre une distance de 30 ou 40 (modifié dans q2 vers 30 ) pour faire la passe, donc je me fais des passes jusqu'a a etre proche du filet et je fais la passe .
+	Dans le cas ou j'ai pas la ball j'ai decidé de positionner les joueurs dans le centre de leurs terrain respectifs 
+	Pour la puissance de passe pour moi meme j'ai fais une puissance de 2 c'est la valeur que j'ai trouvé la plus addapté .
+	
+########################################################################################"
+Question 2 :
+
+	Concernant les attaquants j'ai fais presque le meme raisonnement c'est de me faire des passes jusqu'a a etre proche du filet pour ensuite voir la distance de l'adversaire par rapport aux bords pour ensuite lui envoyé la balle a l'oposé genre si il trop proche d'un bord je lui la balle a l'opposé avec Heigth /2 sinon s'il a plus de 20 de distance des bords je lui envoie a une distance de 2 tiers de sa distance avec le bord le plus loin par rapport a lui 
+	AMELIORATION de l attaque avec une méthode shoot_fil ... qui calcul par rapport a la distance de l adv 
+	s'il est proche du fillet elle frappe loin s'il est loin elle frappe doucement 
+##############################################################################"
+Question3
+
+	sachant que dans Attaque j'ai une méthode qui prédit la position de la balle il reagit parfaitement contre l'attaque aussi car en le fesant jouer contre un autre jouer mais qui n'utilise pas le prediction ce dernier a du mal a suivre la balle et la stratégie Attaque arrive a gagné mais je vais quand meme essayé d'ameliorer 
+	AMELIORATION  maintenant il se place a la hauteur de la balle et dés qu'il peut tirer il la lance l'autre camp
+	
+#########################################################################################"
+Question 4 
+
+	ayant implementer un bon joueur qui attaque et qui en meme temps defends ( q2 ) donc il y a pas mieux que la meme strategy car il attaque et il defens en meme temps 
+	
+########################################################################################
+Question 5 
+
+
+	pour ce qui concerne le 2 V 2 je decide de mettre un attaquant qui attaque et qui verifie s'il la balle est proche de lui il go l'attaquer sinon il attends son coéquipier qui est un defenseur et qui lui passe puis il shoot la balle 
+	
+

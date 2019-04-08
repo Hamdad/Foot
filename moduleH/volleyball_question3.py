@@ -3,7 +3,20 @@ from soccersimulator import Strategy, SoccerAction, Vector2D, SoccerTeam , setti
 from soccersimulator import VolleySimulation, volley_show_simu
 import math
 from tools import SupState
+#from volleyball_question2 import Attaque
 
+class Defense(Strategy):
+    def __init__ (self):
+        Strategy . __init__ (self , "Echauffement")
+        
+    def compute_strategy (self , state , id_team , id_player):
+        sup = SupState(state , id_team , id_player)
+        if sup.can_shoot():
+            return SoccerAction(shoot =(Vector2D(25,45)if sup.sens == -1 else Vector2D(155,45)) - sup.my_position)
+        if sup.ball_ds_mn_terrain():
+            return SoccerAction(acceleration = sup.predict_ball() - sup.my_position)
+        else : 
+            return SoccerAction(acceleration = (Vector2D(80,sup.predict_ball().y)if sup.sens == 1 else Vector2D(100,sup.predict_ball().y)) - sup.my_position)
 
 class Attaque(Strategy):
     def __init__ (self):
@@ -40,7 +53,7 @@ team2 = SoccerTeam(name="Team 2")
 
 # Add players
 team1.add("Player 1", Attaque())  # Random strategy
-team2.add("Player 2", Attaque())   # Random strategy
+team2.add("Def", Defense())   # Random strategy
 
 # Create a match
 simu = VolleySimulation(team1, team2)
